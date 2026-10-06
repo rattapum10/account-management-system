@@ -9,32 +9,40 @@
 <body>
   <div class="container">
     <h1>🏋️ Workout Log</h1>
-    
+
     <div class="card">
       <h2>เพิ่มรายการออกกำลังกาย</h2>
       <form id="workout-form">
-        <input type="text" id="title" placeholder="ชื่อกิจกรรม (เช่น ตีแบดมินตัน)" required>
-        <select id="category" required>
-          <option value="">-- เลือกประเภท --</option>
-          <option value="badminton">badminton</option>
-          <option value="running">running</option>
-          <option value="gym">gym</option>
-          <option value="other">other</option>
-        </select>
-        <input type="number" id="duration" placeholder="ระยะเวลา (นาที)" required min="1">
-        <input type="date" id="date" required>
-        <button type="submit" class="btn-primary">บันทึกรายการ</button>
+        <div class="form-group">
+          <input type="text" id="title" placeholder="ชื่อกิจกรรม (เช่น ตีแบดมินตัน)" required />
+        </div>
+        <div class="form-group">
+          <select id="type" required>
+            <option value="">-- เลือกประเภท --</option>
+            <option value="คาร์ดิโอ">คาร์ดิโอ</option>
+            <option value="เวทเทรนนิ่ง">เวทเทรนนิ่ง</option>
+            <option value="ยืดเหยียด">ยืดเหยียด</option>
+            <option value="กีฬา">กีฬา</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <input type="number" id="duration" placeholder="ระยะเวลา (นาที)" required />
+        </div>
+        <div class="form-group">
+          <input type="date" id="date" required />
+        </div>
+        <button type="submit" class="btn-submit">บันทึกรายการ</button>
       </form>
     </div>
 
     <div class="filter-section">
-      <label for="filter-category">กรองตามประเภท: </label>
-      <select id="filter-category">
-        <option value="all">ทั้งหมด</option>
-        <option value="badminton">badminton</option>
-        <option value="running">running</option>
-        <option value="gym">gym</option>
-        <option value="other">other</option>
+      <label for="filter-type">กรองตามประเภท:</label>
+      <select id="filter-type">
+        <option value="ทั้งหมด">ทั้งหมด</option>
+        <option value="คาร์ดิโอ">คาร์ดิโอ</option>
+        <option value="เวทเทรนนิ่ง">เวทเทรนนิ่ง</option>
+        <option value="ยืดเหยียด">ยืดเหยียด</option>
+        <option value="กีฬา">กีฬา</option>
       </select>
     </div>
 
