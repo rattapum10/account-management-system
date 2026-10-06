@@ -1,81 +1,57 @@
-const message = document.querySelector('#message');
-const userTable = document.querySelector('#user-table');
+document.addEventListener('DOMContentLoaded', () => {
+  fetchWorkouts();
 
-function showMessage(text, isError = false) {
-  message.textContent = text;
-  message.className = isError ? 'error' : 'success';
-}
+  document.getElementById('workout-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('title').value;
+    const category = document.getElementById('category').value;
+    const duration = document.getElementById('duration').value;
+    const date = document.getElementById('date').value;
 
-// ส่งข้อมูล JSON ด้วย POST แล้วคืนผลลัพธ์
-async function postJSON(url, data) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    await fetch('/workouts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, category, duration: Number(duration), date })
+    });
+
+    document.getElementById('workout-form').reset();
+    fetchWorkouts();
   });
-  return { ok: res.ok, body: await res.json() };
-}
 
-// สมัครสมาชิก
-document.querySelector('#register-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const form = e.target;
-  const data = Object.fromEntries(new FormData(form));
-  const { ok, body } = await postJSON('/api/register', data);
-  if (ok) {
-    showMessage(`สมัครสมาชิกสำเร็จ ยินดีต้อนรับคุณ ${body.name}`);
-    form.reset();
-    loadUsers();
-  } else {
-    showMessage(body.error, true);
-  }
+  document.getElementById('filter-category').addEventListener('change', (e) => {
+    fetchWorkouts(e.target.value);
+  });
 });
 
-// เข้าสู่ระบบ
-document.querySelector('#login-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const data = Object.fromEntries(new FormData(e.target));
-  const { ok, body } = await postJSON('/api/login', data);
-  if (ok) {
-    showMessage(`เข้าสู่ระบบสำเร็จ สวัสดีคุณ ${body.user.name} (${body.user.role})`);
-  } else {
-    showMessage(body.error, true);
-  }
-});
+async function fetchWorkouts(filterCategory = 'all') {
+  try {
+    const res = await fetch('/workouts');
+    const data = await res.json();
+    const list = document.getElementById('workout-list');
+    list.innerHTML = '';
 
-// โหลดรายชื่อสมาชิกมาแสดงในตาราง
-async function loadUsers() {
-  const res = await fetch('/api/users');
-  const users = await res.json();
-  userTable.innerHTML = '';
-  
-  for (const user of users) {
-    const tr = document.createElement('tr');
-    for (const value of [user.username, user.name, user.email, user.role]) {
-      const td = document.createElement('td');
-      td.textContent = value;
-      tr.appendChild(td);
-    }
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = 'ลบ';
-    deleteBtn.addEventListener('click', () => deleteUser(user.username));
-    
-    const td = document.createElement('td');
-    td.appendChild(deleteBtn);
-    tr.appendChild(td);
-    
-    userTable.appendChild(tr);
+    const filtered = filterCategory === 'all' 
+      ? data 
+      : data.filter(item => item.category === filterCategory);
+
+    filtered.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'workout-item';
+      div.innerHTML = `
+        <div>
+          <strong>${item.title}</strong> (${item.category}) - ${item.duration} นาที<br>
+          <small class="text-muted">วันที่: ${item.date ? item.date.split('T')[0] : ''}</small>
+        </div>
+        <button class="btn-danger" onclick="deleteWorkout('${item._id || item.id}')">ลบ</button>
+      `;
+      list.appendChild(div);
+    });
+  } catch (err) {
+    console.error('Error fetching workouts:', err);
   }
 }
 
-// ลบบัญชี
-async function deleteUser(username) {
-  if (!confirm(`ลบบัญชี ${username} ใช่หรือไม่?`)) return;
-  const res = await fetch(`/api/users/${username}`, { method: 'DELETE' });
-  if (res.ok) {
-    showMessage(`ลบบัญชี ${username} แล้ว`);
-    loadUsers();
-  }
+async function deleteWorkout(id) {
+  await fetch(`/workouts/${id}`, { method: 'DELETE' });
+  fetchWorkouts(document.getElementById('filter-category').value);
 }
-
-loadUsers();

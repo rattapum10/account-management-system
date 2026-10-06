@@ -5,7 +5,7 @@ const path = require('path');
 
 const MONGO_URL = 'mongodb://127.0.0.1:27017';
 const DATABASE_NAME = 'account-db';
-const PORT = 3000;
+const PORT = 3001; // แก้เป็นพอร์ต 3001 เรียบร้อยแล้ว
 
 const app = express();
 app.use(express.json());
